@@ -59,13 +59,16 @@ class CartPoleEnv(gym.Env):
         force = self.force_mag if action==1 else -self.force_mag
         costheta = math.cos(theta)
         sintheta = math.sin(theta)
+        #底下是车摆的动力学方程式，即加速度与动作之间的关系。
         temp = (force + self.polemass_length * theta_dot * theta_dot * sintheta) / self.total_mass
+        #摆的角加速度
         thetaacc = (self.gravity * sintheta - costheta* temp) / (self.length * (4.0/3.0 - self.masspole * costheta * costheta / self.total_mass))
+        #小车的平移加速
         xacc  = temp - self.polemass_length * thetaacc * costheta / self.total_mass
         x  = x + self.tau * x_dot
         x_dot = x_dot + self.tau * xacc
         theta = theta + self.tau * theta_dot
-        theta_dot = theta_dot + self.tau * thetaacc
+        theta_dot = theta_dot + self.tau * thetaacc #积分求下一步的状态
         self.state = (x,x_dot,theta,theta_dot)
         done =  x < -self.x_threshold \
                 or x > self.x_threshold \
